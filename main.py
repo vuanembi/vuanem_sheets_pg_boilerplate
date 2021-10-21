@@ -7,19 +7,6 @@ from sqlalchemy.engine import Engine
 from sheets import get_sheets_data, get_sheets_service
 from pg import get_engine, load
 
-mock_pipelines = {
-    "spreadsheet_id": "1DghH0_bOFq6Y9lhE_d349xZHw_9WOMUNLhVfwnhA-5E",
-    "range": "'BQ C2L'!A:M",
-    "model": Table(
-        "mock_pipelines",
-        MetaData(schema="C2Leads"),
-        Column("dt", DateTime(timezone=True)),
-        Column("phone", String),
-        Column("name", String),
-        Column("date_utc", DateTime(timezone=True)),
-    ),
-}
-
 
 def parse(results: list) -> list:
     """Parse values from Sheets API
@@ -68,17 +55,30 @@ def run(service: Resource, engine: Engine, pipeline: dict) -> bool:
     Returns:
         bool: Worked or not
     """
-        
+
     results = get_sheets_data(
         service,
         pipeline["spreadsheet_id"],
         pipeline["range"],
     )
-    rows = transform(parse(results))
+    rows = pipeline['transform'](parse(results))
     return load(engine, pipeline["model"], rows)
 
 
 def main():
+    mock_pipelines = {
+        "spreadsheet_id": "1DghH0_bOFq6Y9lhE_d349xZHw_9WOMUNLhVfwnhA-5E",
+        "range": "'BQ C2L'!A:M",
+        "transform": transform,
+        "model": Table(
+            "mock_pipelines",
+            MetaData(schema="C2Leads"),
+            Column("dt", DateTime(timezone=True)),
+            Column("phone", String),
+            Column("name", String),
+            Column("date_utc", DateTime(timezone=True)),
+        ),
+    }
     return print(run(get_sheets_service(), get_engine(), mock_pipelines))
 
 
