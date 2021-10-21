@@ -9,6 +9,8 @@ python = "~3.9"
 google-api-python-client = "^2.27.0"
 google-auth-httplib2 = "^0.1.0"
 google-auth-oauthlib = "^0.4.6"
+SQLAlchemy = "^1.4.26"
+psycopg2-binary = "^2.9.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.9b0"
